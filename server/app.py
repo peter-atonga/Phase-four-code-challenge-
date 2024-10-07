@@ -72,7 +72,10 @@ class PowerUpdate(Resource):
         description = data.get('description')
 
         if description is not None:
-            power.description = description
+            if len(description)<20:
+                return {"errors":["validation errors"]},400
+            else:
+                power.description = description
 
         try:
             db.session.commit()
@@ -99,7 +102,7 @@ class HeroPowerCreate(Resource):
 
         # Validate strength value
         if strength not in ['Strong', 'Weak', 'Average']:
-            return {"errors": ["Strength must be one of 'Strong', 'Weak', 'Average'"]}, 400
+            return {"errors": ["validation errors"]}, 400
 
         # Check if Hero exists
         hero = Hero.query.get(hero_id)
@@ -119,7 +122,7 @@ class HeroPowerCreate(Resource):
             db.session.commit()
             # Serialize the new HeroPower including hero and power details
             hero_power_data = new_hero_power.to_dict()
-            return hero_power_data, 201
+            return hero_power_data, 200
         except ValueError as ve:
             db.session.rollback()
             return {"errors": [str(ve)]}, 400
